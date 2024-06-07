@@ -1,6 +1,7 @@
 package com.art3mvp.newsclient.ui.theme
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,61 +26,115 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.art3mvp.newsclient.R
+import com.art3mvp.newsclient.domain.FeedPost
+import com.art3mvp.newsclient.domain.StatisticItem
+import com.art3mvp.newsclient.domain.StatisticType
 
 
 @Composable
-fun PostCard(modifier: Modifier = Modifier) {
+fun PostCard(
+    modifier: Modifier = Modifier,
+    feedPost: FeedPost,
+    onLikeClickListener: (StatisticItem) -> Unit,
+    onShareClickListener: (StatisticItem) -> Unit,
+    onCommentsClickListener: (StatisticItem) -> Unit,
+    onViewsClickListener: (StatisticItem) -> Unit
+) {
     Card(
         modifier = modifier
-            .verticalScroll(rememberScrollState())
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            PostHeader()
+            PostHeader(feedPost)
             Spacer(modifier = Modifier.height(8.dp))
-            Body()
+            Body(feedPost)
             Spacer(modifier = Modifier.height(8.dp))
-            Statistics()
+            Statistics(feedPost.statistics,
+                onViewsClickListener = onViewsClickListener,
+                onLikeClickListener = onLikeClickListener,
+                onCommentsClickListener = onCommentsClickListener,
+                onShareClickListener = onShareClickListener)
         }
 
     }
 }
 
 @Composable
-fun Body() {
+fun Body(feedPost: FeedPost) {
     Text(
-        text = stringResource(R.string.trip),
+        text = feedPost.contentDescription,
         modifier = Modifier.padding(8.dp)
     )
     Image(
-        modifier = Modifier.fillMaxWidth(),
-        painter = painterResource(id = R.drawable.landscape),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        painter = painterResource(id = feedPost.contentImageResId),
         contentDescription = "landscape",
         contentScale = ContentScale.FillWidth
     )
 }
 
 @Composable
-private fun Statistics() {
+private fun Statistics(
+    statistics: List<StatisticItem>,
+    onLikeClickListener: (StatisticItem) -> Unit,
+    onShareClickListener: (StatisticItem) -> Unit,
+    onCommentsClickListener: (StatisticItem) -> Unit,
+    onViewsClickListener: (StatisticItem) -> Unit
+) {
     Row(modifier = Modifier.padding(8.dp)) {
         Row(modifier = Modifier.weight(1f)) {
-            IconAndText(iconResId = R.drawable.views, value ="313", contentDescription = "views")
+            val viewsItem = statistics.getItemByType(StatisticType.VIEWS)
+            IconAndText(
+                iconResId = R.drawable.views,
+                value = viewsItem.count.toString(),
+                contentDescription = "views"
+            ) {
+                onViewsClickListener(viewsItem)
+            }
         }
 
-        Row(modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.Absolute.SpaceBetween) {
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.Absolute.SpaceBetween
+        ) {
 
-            IconAndText(iconResId = R.drawable.share, value ="1", contentDescription = "share")
-            IconAndText(iconResId = R.drawable.add_comment, value ="14", contentDescription = "comment")
-            IconAndText(iconResId = R.drawable.heart, value ="27", contentDescription = "like")
+            val sharesItem = statistics.getItemByType(StatisticType.SHARES)
+            IconAndText(
+                iconResId = R.drawable.share,
+                value = sharesItem.count.toString(),
+                contentDescription = "shares"
+            ) {
+                onShareClickListener(sharesItem)
+            }
 
+            val commentsItem = statistics.getItemByType(StatisticType.COMMENTS)
+            IconAndText(
+                iconResId = R.drawable.add_comment,
+                value = commentsItem.count.toString(),
+                contentDescription = "comments"
+            ) {
+                onCommentsClickListener(commentsItem)
+            }
+
+            val likesItems = statistics.getItemByType(StatisticType.LIKES)
+            IconAndText(
+                iconResId = R.drawable.heart,
+                value = likesItems.count.toString(),
+                contentDescription = "likes"
+            ) {
+                onLikeClickListener(likesItems)
+            }
         }
     }
+}
+
+private fun List<StatisticItem>.getItemByType(type: StatisticType): StatisticItem {
+    return this.find { it.type == type } ?: throw RuntimeException("getItemByType error")
 }
 
 
@@ -88,8 +143,12 @@ private fun IconAndText(
     value: String,
     iconResId: Int,
     contentDescription: String,
+    onItemClickListener: () -> Unit
 ) {
     Row(
+        modifier = Modifier.clickable {
+            onItemClickListener()
+        },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -106,7 +165,7 @@ private fun IconAndText(
 }
 
 @Composable
-fun PostHeader() {
+fun PostHeader(feedPost: FeedPost) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,7 +176,7 @@ fun PostHeader() {
             modifier = Modifier
                 .size(50.dp)
                 .clip(shape = CircleShape),
-            painter = painterResource(id = R.drawable.photografer),
+            painter = painterResource(id = feedPost.avatarResId),
             contentDescription = "community logo"
         )
         Spacer(modifier = Modifier.width(12.dp))
@@ -126,12 +185,12 @@ fun PostHeader() {
                 .weight(1f)
         ) {
             Text(
-                text = "landscapes group",
+                text = feedPost.communityName,
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "13:37",
+                text = feedPost.publicationDate,
                 color = MaterialTheme.colorScheme.onSecondary
 
             )
@@ -142,21 +201,5 @@ fun PostHeader() {
             contentDescription = "edit",
             tint = MaterialTheme.colorScheme.onSecondaryContainer
         )
-    }
-}
-
-@Preview
-@Composable
-fun PreviewLight() {
-    NewsClientTheme(darkTheme = false) {
-        PostCard()
-    }
-}
-
-@Preview
-@Composable
-fun PreviewDark() {
-    NewsClientTheme(darkTheme = true) {
-        PostCard()
     }
 }
