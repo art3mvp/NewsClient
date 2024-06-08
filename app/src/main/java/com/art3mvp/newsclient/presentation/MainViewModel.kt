@@ -10,12 +10,6 @@ import com.art3mvp.newsclient.ui.theme.NavigationItem
 
 class MainViewModel : ViewModel() {
 
-    private val _selectedNavItem = MutableLiveData<NavigationItem>(NavigationItem.Home)
-    val selectedNavItem: LiveData<NavigationItem> = _selectedNavItem
-
-    fun selectNavItem(item: NavigationItem) {
-        _selectedNavItem.value = item
-    }
 
     private val initialPosts = mutableListOf<FeedPost>().apply {
         repeat(10) {
