@@ -2,28 +2,34 @@ package com.art3mvp.newsclient.ui.theme
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountBox
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.art3mvp.newsclient.R
+import com.art3mvp.newsclient.navigation.Screen
 
 sealed class NavigationItem(
+    val screen: Screen,
     val titleResId: Int,
     val icon: ImageVector,
 ) {
     data object Home : NavigationItem(
+        screen = Screen.NewsFeed,
         titleResId = R.string.navigation_item_home,
-        Icons.Rounded.Home
+        icon = Icons.Rounded.Home
     )
 
     data object Favorite : NavigationItem(
+        screen = Screen.Favourite,
         titleResId = R.string.navigation_item_favorite,
-        Icons.Rounded.FavoriteBorder
+        icon = Icons.Rounded.Favorite
     )
 
     data object Profile : NavigationItem(
+        screen = Screen.Profile,
         titleResId = R.string.navigation_item_profile,
-        Icons.Rounded.AccountBox
+        icon = Icons.Rounded.AccountBox
     )
 
 }
