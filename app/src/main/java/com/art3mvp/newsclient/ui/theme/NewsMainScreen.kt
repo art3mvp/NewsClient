@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,13 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.art3mvp.newsclient.navigation.AppNavGraph
+import com.art3mvp.newsclient.navigation.NavigationState
+import com.art3mvp.newsclient.navigation.Screen
+import com.art3mvp.newsclient.navigation.rememberNavigationState
 import com.art3mvp.newsclient.presentation.MainViewModel
 
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
 
-    val navHostController = rememberNavController()
+
+    val navigationState =  rememberNavigationState()
 
 
     Scaffold(
@@ -35,7 +40,7 @@ fun MainScreen(viewModel: MainViewModel) {
             BottomAppBar(
                 contentColor = MaterialTheme.colorScheme.primary
             ) {
-                val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+                val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val items = listOf(
@@ -46,7 +51,9 @@ fun MainScreen(viewModel: MainViewModel) {
                 items.forEach { item ->
                     NavigationBarItem(
                         selected = currentRoute == item.screen.route,
-                        onClick = { navHostController.navigate(item.screen.route) },
+                        onClick = {
+                            navigationState.navigateTo(item.screen.route)
+                        },
                         icon = { Icon(item.icon, null) },
                         label = { Text(text = stringResource(id = item.titleResId)) },
                         colors = NavigationBarItemDefaults.colors(
@@ -59,10 +66,10 @@ fun MainScreen(viewModel: MainViewModel) {
                     )
                 }
             }
-        },
+        }
     ) { innerPadding ->
         AppNavGraph(
-            navHostController = navHostController,
+            navHostController = navigationState.navHostController,
             homeScreenContent = { HomeScreen(viewModel =viewModel, innerPaddingValues =innerPadding)},
             favouriteScreenContent = { TextCounter("Favorite")},
             profileScreenContent = {TextCounter("Profile")}
@@ -72,7 +79,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
 @Composable
 private fun TextCounter(name: String) {
-    var count by remember {
+    var count by rememberSaveable {
         mutableStateOf(0)
     }
     Text(
