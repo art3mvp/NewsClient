@@ -54,10 +54,13 @@ fun MainScreen() {
                 items.forEach { item ->
 
                     val selected = navBackStackEntry?.destination?.hierarchy?.any {
+
+
                         it.route == item.screen.route
+
                     } ?: false
 
-                    Log.d("VVV", selected.toString())
+
 
                     NavigationBarItem(
                         selected = selected,
