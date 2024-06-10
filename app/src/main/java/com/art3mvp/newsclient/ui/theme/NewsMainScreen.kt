@@ -24,19 +24,13 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.navigation.AppNavGraph
-import com.art3mvp.newsclient.navigation.Screen
+import com.art3mvp.newsclient.navigation.NavigationItem
 import com.art3mvp.newsclient.navigation.rememberNavigationState
 
 
 @Composable
 fun MainScreen() {
-
-
     val navigationState = rememberNavigationState()
-    val commentsToPost: MutableState<FeedPost?> = remember {
-        mutableStateOf(null)
-    }
-
 
     Scaffold(
         bottomBar = {
@@ -89,16 +83,15 @@ fun MainScreen() {
                 HomeScreen(
                     innerPaddingValues = innerPadding,
                     onCommentClickListener = {
-                        commentsToPost.value = it
-                        navigationState.navigateToComments()
+                        navigationState.navigateToComments(it)
                     }
                 )
             },
             favouriteScreenContent = { TextCounter("Favorite") },
             profileScreenContent = { TextCounter("Profile") },
-            commentsScreenContent = {
+            commentsScreenContent = {feedPost ->
                 CommentsScreen(
-                    feedPost = commentsToPost.value!!,
+                    feedPost = feedPost,
                     onBackPressed = { navigationState.navHostController.popBackStack() }
                 )
             }

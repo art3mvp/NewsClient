@@ -1,10 +1,12 @@
 package com.art3mvp.newsclient.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.art3mvp.newsclient.domain.FeedPost
 
 class NavigationState(val navHostController: NavHostController) {
 
@@ -19,9 +21,9 @@ class NavigationState(val navHostController: NavHostController) {
         }
     }
 
-    fun navigateToComments() {
-        navHostController.navigate(Screen.Comments.route)
-    }
+    fun navigateToComments(feedPost: FeedPost) {
+        navHostController.navigate(Screen.Comments.getRouteWithArgs(feedPost)) // comments/15
+     }
 }
 
 @Composable

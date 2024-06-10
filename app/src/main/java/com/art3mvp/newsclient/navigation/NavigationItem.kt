@@ -1,13 +1,11 @@
-package com.art3mvp.newsclient.ui.theme
+package com.art3mvp.newsclient.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.art3mvp.newsclient.R
-import com.art3mvp.newsclient.navigation.Screen
 
 sealed class NavigationItem(
     val screen: Screen,
