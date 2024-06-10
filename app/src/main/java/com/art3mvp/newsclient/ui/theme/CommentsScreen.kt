@@ -25,59 +25,68 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.art3mvp.newsclient.CommentsViewModelFactory
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.PostComment
+import com.art3mvp.newsclient.presentation.CommentsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(
-    feedPost: FeedPost,
-    comments: List<PostComment>,
+    onBackPressed: () -> Unit,
+    feedPost: FeedPost
 ) {
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.padding(bottom = 16.dp),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
+    val viewModel: CommentsViewModel = viewModel(factory = CommentsViewModelFactory(feedPost))
 
-                title = { Text(text = "COMMENTS FOR FEEDPOST Id : ${feedPost.id}") },
-                navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null)
+    val screenState = viewModel.screenState.observeAsState(CommentsScreenState.Initial)
+    val currentState = screenState.value
+
+    if (currentState is CommentsScreenState.Comments) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+
+                    title = { Text(text = "COMMENTS FOR FEEDPOST Id : ${currentState.feedPost.id}") },
+                    navigationIcon = {
+                        IconButton(onClick = { onBackPressed() }) {
+                            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null)
+                        }
                     }
-                }
-            )
-        }
+                )
+            }
 
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(
-                start = 8.dp,
-                top = 16.dp,
-                end = 8.dp,
-                bottom = 90.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            items(items = comments, key = { it.id }) { postComment ->
-                CommentItem(comment = postComment)
+        ) { innerPadding ->
+            LazyColumn(
+                modifier = Modifier.padding(innerPadding),
+                contentPadding = PaddingValues(
+                    start = 8.dp,
+                    top = 16.dp,
+                    end = 8.dp,
+                    bottom = 90.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(items = currentState.comments, key = { it.id }) { postComment ->
+                    CommentItem(comment = postComment)
+                }
             }
         }
     }
-
-
 }
 
 
