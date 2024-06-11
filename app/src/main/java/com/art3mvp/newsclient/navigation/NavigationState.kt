@@ -22,7 +22,7 @@ class NavigationState(val navHostController: NavHostController) {
     }
 
     fun navigateToComments(feedPost: FeedPost) {
-        navHostController.navigate(Screen.Comments.getRouteWithArgs(feedPost)) // comments/15
+        navHostController.navigate(Screen.Comments.getRouteWithArgs(feedPost))
      }
 }
 
