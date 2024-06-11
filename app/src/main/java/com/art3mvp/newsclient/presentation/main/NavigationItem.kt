@@ -1,9 +1,8 @@
-package com.art3mvp.newsclient.ui.theme
+package com.art3mvp.newsclient.presentation.main
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.art3mvp.newsclient.R

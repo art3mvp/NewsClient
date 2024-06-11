@@ -16,7 +16,7 @@ class NewsFeedViewModel : ViewModel() {
             this.add(
                 FeedPost(
                     id = it,
-                    contentDescription = "content: $it"
+                    contentDescription = "content --- $it"
                 )
             )
         }

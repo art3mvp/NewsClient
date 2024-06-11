@@ -61,7 +61,7 @@ fun CommentsScreen(
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
 
-                    title = { Text(text = "COMMENTS FOR FEEDPOST Id : ${currentState.feedPost.id}") },
+                    title = { Text(text = "COMMENTS FOR FEEDPOST Id : ${currentState.feedPost.contentDescription}") },
                     navigationIcon = {
                         IconButton(onClick = { onBackPressed() }) {
                             Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null)
