@@ -1,12 +1,10 @@
-package com.art3mvp.newsclient.presentation
+package com.art3mvp.newsclient.presentation.comments
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.PostComment
-import com.art3mvp.newsclient.ui.theme.CommentsScreenState
-import com.art3mvp.newsclient.ui.theme.NewsFeedScreenState
 
 class CommentsViewModel(
     feedPost: FeedPost

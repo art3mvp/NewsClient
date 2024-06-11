@@ -1,4 +1,4 @@
-package com.art3mvp.newsclient.ui.theme
+package com.art3mvp.newsclient.presentation.comments
 
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.PostComment

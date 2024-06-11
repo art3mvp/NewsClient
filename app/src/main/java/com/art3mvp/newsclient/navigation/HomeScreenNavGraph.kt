@@ -1,9 +1,7 @@
 package com.art3mvp.newsclient.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
@@ -25,14 +23,12 @@ fun NavGraphBuilder.homeScreenNavGraph(
         composable(
             route = Screen.Comments.route,
             arguments = listOf(
-                navArgument(Screen.KEY_FEED_POST_ID) { type = NavType.IntType },
-                navArgument(Screen.KEY_CONTENT_DESCRIPTION) { type = NavType.StringType })
-        ) { //comments/{feed_post_id}
-            val feedPostId = it.arguments?.getInt(Screen.KEY_FEED_POST_ID) ?: 0
-            val feedPostDescription = it.arguments?.getString(Screen.KEY_CONTENT_DESCRIPTION) ?: ""
-            Log.d("VVV", "${it.arguments}")
+                navArgument(Screen.KEY_FEED_POST) { type = FeedPost.NavigationType })
+        ) {
 
-            commentsScreenContent(FeedPost(id = feedPostId, contentDescription = feedPostDescription))
+            val feedPost = it.arguments?.getParcelable<FeedPost>(Screen.KEY_FEED_POST)
+                ?: throw RuntimeException("args is null")
+            commentsScreenContent(feedPost)
         }
     }
 }

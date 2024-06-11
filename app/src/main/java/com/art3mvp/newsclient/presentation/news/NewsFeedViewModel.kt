@@ -1,11 +1,10 @@
-package com.art3mvp.newsclient.presentation
+package com.art3mvp.newsclient.presentation.news
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.StatisticItem
-import com.art3mvp.newsclient.ui.theme.NewsFeedScreenState
 
 class NewsFeedViewModel : ViewModel() {
 
@@ -16,7 +15,7 @@ class NewsFeedViewModel : ViewModel() {
             this.add(
                 FeedPost(
                     id = it,
-                    contentDescription = "content --- $it"
+                    contentDescription = "content/$it"
                 )
             )
         }

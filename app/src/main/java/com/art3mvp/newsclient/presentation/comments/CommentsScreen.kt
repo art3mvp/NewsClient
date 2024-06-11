@@ -1,4 +1,4 @@
-package com.art3mvp.newsclient.ui.theme
+package com.art3mvp.newsclient.presentation.comments
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,10 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.art3mvp.newsclient.CommentsViewModelFactory
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.PostComment
-import com.art3mvp.newsclient.presentation.CommentsViewModel
+import com.art3mvp.newsclient.ui.theme.NewsClientTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
