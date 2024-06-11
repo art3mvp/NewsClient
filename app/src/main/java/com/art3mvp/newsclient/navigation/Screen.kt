@@ -1,6 +1,9 @@
 package com.art3mvp.newsclient.navigation
 
+import android.net.Uri
 import com.art3mvp.newsclient.domain.FeedPost
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 
 sealed class Screen(
     val route: String,
@@ -15,18 +18,24 @@ sealed class Screen(
         private const val ROUTE_FOR_ARGS = "comments"
 
         fun getRouteWithArgs(feedPost: FeedPost): String {
-            return "$ROUTE_FOR_ARGS/${feedPost.id}/${feedPost.contentDescription}"
+            val feedPostGson = Gson().toJson(feedPost)
+
+            return "$ROUTE_FOR_ARGS/${feedPostGson.encode()}"
         }
     }
 
     companion object {
 
-        const val KEY_CONTENT_DESCRIPTION = "content_text"
-        const val KEY_FEED_POST_ID = "feed_post_id"
+
+        const val KEY_FEED_POST = "feed_post"
         const val ROUTE_HOME = "home"
-        const val ROUTE_COMMENTS = "comments/{$KEY_FEED_POST_ID}/{$KEY_CONTENT_DESCRIPTION}"
+        const val ROUTE_COMMENTS = "comments/{$KEY_FEED_POST}"
         const val ROUTE_NEWS_FEED = "news_feed"
         const val ROUTE_FAVOURITE = "favourite"
         const val ROUTE_PROFILE = "profile"
     }
+}
+
+fun String.encode(): String {
+    return Uri.encode(this)
 }

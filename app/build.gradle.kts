@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -75,4 +76,13 @@ dependencies {
 
     val lifecycle_version = "2.8.1"
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+
+    implementation("com.google.code.gson:gson:2.11.0")
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+
+    implementation("com.vk:android-sdk-core:4.1.0")
+    implementation("com.vk:android-sdk-api:4.1.0")
+
 }

@@ -1,6 +1,5 @@
-package com.art3mvp.newsclient.ui.theme
+package com.art3mvp.newsclient.presentation.news
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,16 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.presentation.NewsFeedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(
+fun NewsFeedScreen(
     innerPaddingValues: PaddingValues,
     onCommentClickListener: (FeedPost) -> Unit,
 ) {

@@ -1,9 +1,8 @@
-package com.art3mvp.newsclient
+package com.art3mvp.newsclient.presentation.comments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.presentation.CommentsViewModel
 
 class CommentsViewModelFactory(
     private val feedPost: FeedPost
