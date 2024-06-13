@@ -25,6 +25,7 @@ class NewsFeedViewModel(application: Application) : AndroidViewModel(application
     private val repository = NewsFeedRepositoryImpl(application)
 
     init {
+        _screenState.value = NewsFeedScreenState.Loading
         loadRecommendations()
     }
 
@@ -37,7 +38,9 @@ class NewsFeedViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun loadNextRecommendations() {
+
+
+     fun loadNextRecommendations() {
         _screenState.value = NewsFeedScreenState.Posts(
             posts = repository.feedPosts,
             nextDataLoading = true
@@ -52,42 +55,11 @@ class NewsFeedViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun updateCount(feedPost: FeedPost, newItem: StatisticItem) {
-
-        val currentState = screenState.value
-        if (currentState !is NewsFeedScreenState.Posts) return
-
-        val oldPosts = currentState.posts.toMutableList()
-
-        val newStatistics = feedPost.statistics.map { oldItem ->
-            if (oldItem.type == newItem.type) {
-                oldItem.copy(count = oldItem.count + 1)
-            } else {
-                oldItem
-            }
-        }
-
-        val newPosts = oldPosts.apply {
-            replaceAll {
-                if (feedPost.id == it.id) {
-                    feedPost.copy(statistics = newStatistics)
-                } else {
-                    it
-                }
-            }
-        }
-
-        _screenState.value = NewsFeedScreenState.Posts(newPosts)
-    }
-
     fun removeFeedPost(feedPost: FeedPost) {
+        viewModelScope.launch {
+            repository.ignorePost(feedPost)
+            _screenState.value = NewsFeedScreenState.Posts(posts = repository.feedPosts)
+        }
 
-        val currentState = screenState.value
-        if (currentState !is NewsFeedScreenState.Posts) return
-
-        val modifierList = currentState.posts.toMutableList()
-        modifierList.remove(feedPost)
-        _screenState.value = NewsFeedScreenState.Posts(modifierList)
     }
-
 }

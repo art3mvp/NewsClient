@@ -1,5 +1,6 @@
 package com.art3mvp.newsclient.data.network
 
+import com.art3mvp.newsclient.data.model.IgnoreResponseDto
 import com.art3mvp.newsclient.data.model.LikesCountResponseDto
 import com.art3mvp.newsclient.data.model.NewsFeedResponseDto
 import retrofit2.http.GET
@@ -31,4 +32,11 @@ interface ApiService {
         @Query("owner_id") ownerId: Long,
         @Query("item_id") itemId: Long
     ): LikesCountResponseDto
+
+    @GET("newsfeed.ignoreItem?v=5.199&type=wall")
+    suspend fun ignorePost(
+        @Query("access_token") token: String,
+        @Query("owner_id") ownerId: Long,
+        @Query("item_id") itemId: Long
+    ): IgnoreResponseDto
 }
