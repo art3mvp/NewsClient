@@ -47,6 +47,15 @@ class NewsFeedRepositoryImpl(application: Application) {
         return token?.accessToken ?: throw IllegalStateException("Token is null")
     }
 
+    suspend fun ignorePost(feedPost: FeedPost) {
+        val response = apiService.ignorePost(
+            token = getAccessToken(),
+            ownerId = feedPost.communityId,
+            itemId = feedPost.id
+        )
+        _feedPosts.remove(feedPost)
+    }
+
 
     suspend fun changeLikeStatus(feedPost: FeedPost) {
         val response = if (feedPost.isLiked) {
