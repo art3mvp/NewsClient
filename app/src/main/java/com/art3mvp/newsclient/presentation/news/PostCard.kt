@@ -1,7 +1,5 @@
 package com.art3mvp.newsclient.presentation.news
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -32,6 +31,7 @@ import com.art3mvp.newsclient.R
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.StatisticItem
 import com.art3mvp.newsclient.domain.StatisticType
+import java.util.Locale
 
 
 @Composable
@@ -41,7 +41,7 @@ fun PostCard(
     onLikeClickListener: (StatisticItem) -> Unit,
     onShareClickListener: (StatisticItem) -> Unit,
     onCommentsClickListener: (StatisticItem) -> Unit,
-    onViewsClickListener: (StatisticItem) -> Unit
+    onViewsClickListener: (StatisticItem) -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -53,11 +53,14 @@ fun PostCard(
             Spacer(modifier = Modifier.height(8.dp))
             Body(feedPost)
             Spacer(modifier = Modifier.height(8.dp))
-            Statistics(feedPost.statistics,
+            Statistics(
+                feedPost.statistics,
                 onViewsClickListener = onViewsClickListener,
                 onLikeClickListener = onLikeClickListener,
                 onCommentsClickListener = onCommentsClickListener,
-                onShareClickListener = onShareClickListener)
+                onShareClickListener = onShareClickListener,
+                isFavourite = feedPost.isLiked
+            )
         }
 
     }
@@ -85,52 +88,71 @@ private fun Statistics(
     onLikeClickListener: (StatisticItem) -> Unit,
     onShareClickListener: (StatisticItem) -> Unit,
     onCommentsClickListener: (StatisticItem) -> Unit,
-    onViewsClickListener: (StatisticItem) -> Unit
+    onViewsClickListener: (StatisticItem) -> Unit,
+    isFavourite: Boolean,
 ) {
     Row(modifier = Modifier.padding(8.dp)) {
         Row(modifier = Modifier.weight(1f)) {
             val viewsItem = statistics.getItemByType(StatisticType.VIEWS)
             IconAndText(
                 iconResId = R.drawable.views,
-                value = viewsItem.count.toString(),
-                contentDescription = "views"
-            ) {
-                onViewsClickListener(viewsItem)
-            }
+                value = formatStatisticCount(viewsItem.count),
+                contentDescription = "views",
+                onItemClickListener =
+                {
+                    onViewsClickListener(viewsItem)
+                })
         }
 
         Row(
             modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.Absolute.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
             val sharesItem = statistics.getItemByType(StatisticType.SHARES)
             IconAndText(
                 iconResId = R.drawable.share,
-                value = sharesItem.count.toString(),
-                contentDescription = "shares"
-            ) {
-                onShareClickListener(sharesItem)
-            }
+                value = formatStatisticCount(sharesItem.count),
+                contentDescription = "shares",
+                onItemClickListener =
+                {
+                    onShareClickListener(sharesItem)
+                })
+
+
 
             val commentsItem = statistics.getItemByType(StatisticType.COMMENTS)
             IconAndText(
                 iconResId = R.drawable.add_comment,
-                value = commentsItem.count.toString(),
-                contentDescription = "comments"
-            ) {
-                onCommentsClickListener(commentsItem)
-            }
+                value = formatStatisticCount(commentsItem.count),
+                contentDescription = "comments",
+                onItemClickListener =
+                {
+                    onCommentsClickListener(commentsItem)
+                })
+
 
             val likesItems = statistics.getItemByType(StatisticType.LIKES)
             IconAndText(
-                iconResId = R.drawable.heart,
-                value = likesItems.count.toString(),
-                contentDescription = "likes"
-            ) {
-                onLikeClickListener(likesItems)
-            }
+                iconResId = if (isFavourite) R.drawable.red_heart else R.drawable.heart,
+                value = formatStatisticCount(likesItems.count),
+                contentDescription = "likes",
+                onItemClickListener = {
+                    onLikeClickListener(likesItems)
+                },
+                tint = if (isFavourite) Color.Red else MaterialTheme.colorScheme.onSecondary
+            )
         }
+    }
+}
+
+private fun formatStatisticCount(count: Long): String {
+    return if (count > 100_000) {
+        String.format("%sK", (count / 1000))
+    } else if (count > 1000) {
+        String.format(Locale.getDefault(), "%.1fK", (count / 1000f))
+    } else {
+        count.toString()
     }
 }
 
@@ -144,7 +166,8 @@ private fun IconAndText(
     value: String,
     iconResId: Int,
     contentDescription: String,
-    onItemClickListener: () -> Unit
+    onItemClickListener: () -> Unit,
+    tint: Color = MaterialTheme.colorScheme.onSecondary,
 ) {
     Row(
         modifier = Modifier.clickable {
@@ -153,11 +176,12 @@ private fun IconAndText(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
+            modifier = Modifier.size(20.dp),
             painter = painterResource(id = iconResId),
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.onSecondary
+            tint = tint
         )
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(3.dp))
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onSecondary

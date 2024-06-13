@@ -100,17 +100,17 @@ fun FeedPosts(
                 dismissContent = {
                     PostCard(
                         feedPost = feedPost,
-                        onViewsClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
+                        onViewsClickListener = {
+
                         },
                         onShareClickListener = { statisticItem ->
                             viewModel.updateCount(feedPost, statisticItem)
                         },
-                        onCommentsClickListener = { statisticItem ->
+                        onCommentsClickListener = {
                             onCommentClickListener(feedPost)
                         },
-                        onLikeClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
+                        onLikeClickListener = {
+                            viewModel.changeLikeStatus(feedPost)
                         },
                     )
                 },
