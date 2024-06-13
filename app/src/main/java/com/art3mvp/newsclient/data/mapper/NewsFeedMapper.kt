@@ -1,5 +1,6 @@
 package com.art3mvp.newsclient.data.mapper
 
+import android.util.Log
 import com.art3mvp.newsclient.data.model.NewsFeedResponseDto
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.StatisticItem
@@ -19,6 +20,7 @@ class NewsFeedMapper {
         val groups = responseDto.newsFeedContent.groups
 
         for (post in posts) {
+
             groups.find { it.id == post.sourceId.absoluteValue }?.let {group ->
                 val feedPost = FeedPost(
                     id = post.id,
