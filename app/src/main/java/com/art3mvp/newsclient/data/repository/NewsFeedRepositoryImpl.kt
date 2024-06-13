@@ -13,8 +13,8 @@ import com.vk.api.sdk.auth.VKAccessToken
 
 class NewsFeedRepositoryImpl(application: Application) {
 
-    val storage = VKPreferencesKeyValueStorage(application)
-    val token = VKAccessToken.restore(storage)
+    private val storage = VKPreferencesKeyValueStorage(application)
+    private val token = VKAccessToken.restore(storage)
 
     private val apiService = ApiFactory.apiService
     private val mapper = NewsFeedMapper()
@@ -23,13 +23,25 @@ class NewsFeedRepositoryImpl(application: Application) {
     val feedPosts: List<FeedPost>
         get() = _feedPosts.toList()
 
+    private var nextFrom: String? = null
+
     suspend fun loadRecommendations(): List<FeedPost> {
-        val response = apiService.loadRecommendation(getAccessToken())
+        val startFrom = nextFrom
+        Log.d("VVV", startFrom.toString())
+
+        if (startFrom == null && feedPosts.isNotEmpty()) return feedPosts
+
+        val response = if (startFrom == null) {
+            apiService.loadRecommendation(getAccessToken())
+        } else {
+            apiService.loadRecommendation(getAccessToken(), startFrom)
+        }
+        nextFrom = response.newsFeedContent.nextFrom
+
         val posts = mapper.mapResponseToPosts(response)
         _feedPosts.addAll(posts)
-        return posts
+        return feedPosts
     }
-
 
     private fun getAccessToken(): String {
         return token?.accessToken ?: throw IllegalStateException("Token is null")
