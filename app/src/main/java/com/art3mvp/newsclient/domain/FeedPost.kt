@@ -11,29 +11,24 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FeedPost(
-    val id: Int = 0,
-    val communityName: String = "dev/photo",
-    val publicationDate: String = "12:00",
-    val avatarResId: Int = R.drawable.photografer,
-    val contentDescription: String = "lorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsumlorem ipsum",
-    val contentImageResId: Int = R.drawable.landscape,
-    val statistics: List<StatisticItem> = listOf(
-        StatisticItem(StatisticType.VIEWS, 131),
-        StatisticItem(StatisticType.SHARES, 41),
-        StatisticItem(StatisticType.COMMENTS, 44),
-        StatisticItem(StatisticType.LIKES, 5)
-    )
-): Parcelable  {
+    val id: String,
+    val communityName: String,
+    val publicationDate: String,
+    val communityImageUrl: String,
+    val contentDescription: String,
+    val contentImageUrl: String?,
+    val statistics: List<StatisticItem>
+) : Parcelable {
 
     companion object {
 
         val NavigationType: NavType<FeedPost> = object : NavType<FeedPost>(false) {
             override fun get(bundle: Bundle, key: String): FeedPost? {
-               return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                   bundle.getParcelable(key, FeedPost::class.java)
-               } else {
-                  bundle.getParcelable(key)
-               }
+                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    bundle.getParcelable(key, FeedPost::class.java)
+                } else {
+                    bundle.getParcelable(key)
+                }
             }
 
             override fun parseValue(value: String): FeedPost {
@@ -41,7 +36,7 @@ data class FeedPost(
             }
 
             override fun put(bundle: Bundle, key: String, value: FeedPost) {
-                bundle.putParcelable(key,value)
+                bundle.putParcelable(key, value)
             }
         }
     }
