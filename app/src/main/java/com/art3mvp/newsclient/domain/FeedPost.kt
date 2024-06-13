@@ -8,16 +8,19 @@ import androidx.navigation.NavType
 import com.art3mvp.newsclient.R
 import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
+import kotlin.random.Random
 
 @Parcelize
 data class FeedPost(
-    val id: String,
+    val id: Long,
+    val communityId: Long,
     val communityName: String,
     val publicationDate: String,
     val communityImageUrl: String,
     val contentDescription: String,
     val contentImageUrl: String?,
-    val statistics: List<StatisticItem>
+    val statistics: List<StatisticItem>,
+    val isLiked: Boolean
 ) : Parcelable {
 
     companion object {
