@@ -2,10 +2,10 @@ package com.art3mvp.newsclient.data.repository
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import com.art3mvp.newsclient.data.mapper.NewsFeedMapper
+import com.art3mvp.newsclient.data.mapper.MainMapper
 import com.art3mvp.newsclient.data.network.ApiFactory
 import com.art3mvp.newsclient.domain.FeedPost
+import com.art3mvp.newsclient.domain.PostComment
 import com.art3mvp.newsclient.domain.StatisticItem
 import com.art3mvp.newsclient.domain.StatisticType
 import com.vk.api.sdk.VKPreferencesKeyValueStorage
@@ -17,7 +17,7 @@ class NewsFeedRepositoryImpl(application: Application) {
     private val token = VKAccessToken.restore(storage)
 
     private val apiService = ApiFactory.apiService
-    private val mapper = NewsFeedMapper()
+    private val mapper = MainMapper()
 
     private val _feedPosts = mutableListOf<FeedPost>()
     val feedPosts: List<FeedPost>
@@ -41,6 +41,16 @@ class NewsFeedRepositoryImpl(application: Application) {
         val posts = mapper.mapResponseToPosts(response)
         _feedPosts.addAll(posts)
         return feedPosts
+    }
+
+    suspend fun getComments(feedPost: FeedPost): List<PostComment> {
+        val response = apiService.getComments(
+            token = getAccessToken(),
+            ownerId = feedPost.communityId,
+            postId = feedPost.id
+        )
+        Log.d("VVV", response.toString())
+        return mapper.mapResponseToPostComments(response)
     }
 
     private fun getAccessToken(): String {

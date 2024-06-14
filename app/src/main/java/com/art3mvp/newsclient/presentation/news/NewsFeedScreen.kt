@@ -123,6 +123,7 @@ fun FeedPosts(
                         },
                         onCommentsClickListener = {
                             onCommentClickListener(feedPost)
+                            viewModel.getCommentsFromFeedPost(feedPost)
                         },
                         onLikeClickListener = {
                             viewModel.changeLikeStatus(feedPost)

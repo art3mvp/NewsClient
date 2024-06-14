@@ -1,8 +1,9 @@
 package com.art3mvp.newsclient.data.mapper
 
-import android.util.Log
+import com.art3mvp.newsclient.data.model.CommentsResponseDto
 import com.art3mvp.newsclient.data.model.NewsFeedResponseDto
 import com.art3mvp.newsclient.domain.FeedPost
+import com.art3mvp.newsclient.domain.PostComment
 import com.art3mvp.newsclient.domain.StatisticItem
 import com.art3mvp.newsclient.domain.StatisticType
 import java.text.SimpleDateFormat
@@ -11,7 +12,7 @@ import java.util.Locale
 import kotlin.math.absoluteValue
 
 
-class NewsFeedMapper {
+class MainMapper {
 
     fun mapResponseToPosts(responseDto: NewsFeedResponseDto): List<FeedPost> {
         val result = mutableListOf<FeedPost>()
@@ -42,6 +43,28 @@ class NewsFeedMapper {
             }
         }
         return result
+    }
+
+    fun mapResponseToPostComments(response: CommentsResponseDto): List<PostComment> {
+        val commentsList = mutableListOf<PostComment>()
+
+
+        response.commentsContainer.commentsList.forEach { commentDto ->
+
+            val user = response.commentsContainer.profilesList.find { it.id == commentDto.fromId}
+            if (user != null && commentDto.text.isNotBlank()) {
+                val comment = PostComment(
+                    id = commentDto.id,
+                    authorId = commentDto.fromId,
+                    avatarUrl = user.avatarUrl,
+                    authorName = user.userName,
+                    commentText = commentDto.text,
+                    publicationDate = mapTimeStampToDate(commentDto.date)
+                )
+                commentsList.add(comment)
+            }
+        }
+        return commentsList
     }
 
     private fun mapTimeStampToDate(timeStamp: Long): String {
