@@ -1,6 +1,6 @@
 package com.art3mvp.newsclient.presentation.comments
 
-import androidx.compose.foundation.Image
+import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,24 +28,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.art3mvp.newsclient.R
 import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.PostComment
-import com.art3mvp.newsclient.ui.theme.NewsClientTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(
     onBackPressed: () -> Unit,
-    feedPost: FeedPost
+    feedPost: FeedPost,
 ) {
 
-    val viewModel: CommentsViewModel = viewModel(factory = CommentsViewModelFactory(feedPost))
+    val context = LocalContext.current.applicationContext as Application
+    val viewModel: CommentsViewModel = viewModel(
+        factory = CommentsViewModelFactory(
+            application = context,
+            feedPost = feedPost
+        )
+    )
 
     val screenState = viewModel.screenState.observeAsState(CommentsScreenState.Initial)
     val currentState = screenState.value
@@ -59,7 +68,7 @@ fun CommentsScreen(
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
 
-                    title = { Text(text = "COMMENTS FOR FEEDPOST Id : ${currentState.feedPost.contentDescription}") },
+                    title = { Text(text = stringResource(R.string.comments)) },
                     navigationIcon = {
                         IconButton(onClick = { onBackPressed() }) {
                             Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null)
@@ -77,7 +86,7 @@ fun CommentsScreen(
                     end = 8.dp,
                     bottom = 90.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(items = currentState.comments, key = { it.id }) { postComment ->
                     CommentItem(comment = postComment)
@@ -86,7 +95,6 @@ fun CommentsScreen(
         }
     }
 }
-
 
 @Composable
 private fun CommentItem(
@@ -101,9 +109,11 @@ private fun CommentItem(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            modifier = Modifier.size(30.dp),
-            painter = painterResource(id = comment.avatarResId),
+        AsyncImage(
+            model = comment.avatarUrl,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape),
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -111,28 +121,20 @@ private fun CommentItem(
             Text(
                 text = comment.authorName,
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontSize = 12.sp
+                fontSize = 14.sp
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = comment.commentText,
-                fontSize = 14.sp,
+                fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = comment.publicationDate,
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontSize = 12.sp
+                fontSize = 14.sp
             )
         }
-    }
-}
-
-@Preview
-@Composable
-fun Preview() {
-    NewsClientTheme {
-        CommentItem(comment = PostComment())
     }
 }

@@ -1,14 +1,12 @@
 package com.art3mvp.newsclient.presentation.news
 
 import android.app.Application
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.art3mvp.newsclient.data.repository.NewsFeedRepositoryImpl
 import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.domain.StatisticItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -39,7 +37,6 @@ class NewsFeedViewModel(application: Application) : AndroidViewModel(application
     }
 
 
-
      fun loadNextRecommendations() {
         _screenState.value = NewsFeedScreenState.Posts(
             posts = repository.feedPosts,
@@ -60,6 +57,11 @@ class NewsFeedViewModel(application: Application) : AndroidViewModel(application
             repository.ignorePost(feedPost)
             _screenState.value = NewsFeedScreenState.Posts(posts = repository.feedPosts)
         }
+    }
 
+    fun getCommentsFromFeedPost(feedPost: FeedPost) {
+        viewModelScope.launch {
+            repository.getComments(feedPost)
+        }
     }
 }
