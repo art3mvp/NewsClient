@@ -8,8 +8,19 @@ import com.art3mvp.newsclient.domain.FeedPost
 import com.art3mvp.newsclient.domain.PostComment
 import com.art3mvp.newsclient.domain.StatisticItem
 import com.art3mvp.newsclient.domain.StatisticType
+import com.art3mvp.newsclient.extensions.mergeWith
 import com.vk.api.sdk.VKPreferencesKeyValueStorage
 import com.vk.api.sdk.auth.VKAccessToken
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.flow.stateIn
 
 class NewsFeedRepositoryImpl(application: Application) {
 
@@ -19,38 +30,63 @@ class NewsFeedRepositoryImpl(application: Application) {
     private val apiService = ApiFactory.apiService
     private val mapper = MainMapper()
 
-    private val _feedPosts = mutableListOf<FeedPost>()
-    val feedPosts: List<FeedPost>
-        get() = _feedPosts.toList()
-
     private var nextFrom: String? = null
 
-    suspend fun loadRecommendations(): List<FeedPost> {
-        val startFrom = nextFrom
-        Log.d("VVV", startFrom.toString())
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-        if (startFrom == null && feedPosts.isNotEmpty()) return feedPosts
+    private val nextDataNeededEvent = MutableSharedFlow<Unit>(replay = 1)
+    private val refreshedListFlow = MutableSharedFlow<List<FeedPost>>()
+    private val loadedListFlow = flow {
+        nextDataNeededEvent.emit(Unit)
+        nextDataNeededEvent.collect {
+            val startFrom = nextFrom
+            Log.d("VVV", "startFrom: $startFrom")
 
-        val response = if (startFrom == null) {
-            apiService.loadRecommendation(getAccessToken())
-        } else {
-            apiService.loadRecommendation(getAccessToken(), startFrom)
+            if (startFrom == null && feedPosts.isNotEmpty()) {
+                this.emit(feedPosts)
+                return@collect
+            }
+            val response = if (startFrom == null) {
+                apiService.loadRecommendation(getAccessToken())
+            } else {
+                apiService.loadRecommendation(getAccessToken(), startFrom)
+            }
+            nextFrom = response.newsFeedContent.nextFrom
+            val posts = mapper.mapResponseToPosts(response)
+            _feedPosts.addAll(posts)
+            this.emit(feedPosts)
         }
-        nextFrom = response.newsFeedContent.nextFrom
-
-        val posts = mapper.mapResponseToPosts(response)
-        _feedPosts.addAll(posts)
-        return feedPosts
+    }
+        .retry() {
+        delay(RETRY_TIMEOUT)
+        true
     }
 
-    suspend fun getComments(feedPost: FeedPost): List<PostComment> {
+    private val _feedPosts = mutableListOf<FeedPost>()
+    private val feedPosts: List<FeedPost>
+        get() = _feedPosts.toList()
+
+    val recommendations: StateFlow<List<FeedPost>> = loadedListFlow
+        .mergeWith(refreshedListFlow)
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Lazily,
+            initialValue = feedPosts
+        )
+
+    suspend fun loadNextData() {
+        nextDataNeededEvent.emit(Unit)
+    }
+
+    fun getComments(feedPost: FeedPost): Flow<List<PostComment>> = flow {
         val response = apiService.getComments(
-            token = getAccessToken(),
-            ownerId = feedPost.communityId,
-            postId = feedPost.id
+            token = getAccessToken(), ownerId = feedPost.communityId, postId = feedPost.id
         )
         Log.d("VVV", response.toString())
-        return mapper.mapResponseToPostComments(response)
+        emit(mapper.mapResponseToPostComments(response))
+    }.retry {
+        delay(RETRY_TIMEOUT)
+        true
     }
 
     private fun getAccessToken(): String {
@@ -59,26 +95,20 @@ class NewsFeedRepositoryImpl(application: Application) {
 
     suspend fun ignorePost(feedPost: FeedPost) {
         val response = apiService.ignorePost(
-            token = getAccessToken(),
-            ownerId = feedPost.communityId,
-            itemId = feedPost.id
+            token = getAccessToken(), ownerId = feedPost.communityId, itemId = feedPost.id
         )
         _feedPosts.remove(feedPost)
+        refreshedListFlow.emit(feedPosts)
     }
-
 
     suspend fun changeLikeStatus(feedPost: FeedPost) {
         val response = if (feedPost.isLiked) {
             apiService.deleteLike(
-                token = getAccessToken(),
-                ownerId = feedPost.communityId,
-                itemId = feedPost.id
+                token = getAccessToken(), ownerId = feedPost.communityId, itemId = feedPost.id
             )
         } else {
             apiService.addLike(
-                token = getAccessToken(),
-                ownerId = feedPost.communityId,
-                itemId = feedPost.id
+                token = getAccessToken(), ownerId = feedPost.communityId, itemId = feedPost.id
             )
         }
 
@@ -93,5 +123,10 @@ class NewsFeedRepositoryImpl(application: Application) {
 
         val postIndex = _feedPosts.indexOf(feedPost)
         _feedPosts[postIndex] = newPost
+        refreshedListFlow.emit(feedPosts)
+    }
+
+    companion object {
+        private const val RETRY_TIMEOUT = 5000L
     }
 }
