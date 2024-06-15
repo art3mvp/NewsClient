@@ -1,37 +1,20 @@
 package com.art3mvp.newsclient.presentation.comments
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.art3mvp.newsclient.data.repository.NewsFeedRepositoryImpl
 import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.domain.PostComment
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class CommentsViewModel(
     application: Application,
-    feedPost: FeedPost
-): ViewModel() {
-
-
-    private val _screenState = MutableLiveData<CommentsScreenState>(CommentsScreenState.Initial)
-    val screenState: LiveData<CommentsScreenState> = _screenState
+    feedPost: FeedPost,
+) : ViewModel() {
 
     private val repository = NewsFeedRepositoryImpl(application)
 
-    init {
-        loadComments(feedPost)
-    }
+    val screenState: Flow<CommentsScreenState> = repository.getComments(feedPost)
+        .map { CommentsScreenState.Comments(feedPost, it) }
 
-
-    private fun loadComments(feedPost: FeedPost) {
-        viewModelScope.launch {
-            val comments = mutableListOf<PostComment>().apply {
-                addAll(repository.getComments(feedPost))
-            }
-            _screenState.value = CommentsScreenState.Comments(feedPost, comments)
-        }
-    }
 }
