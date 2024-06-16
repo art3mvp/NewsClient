@@ -1,4 +1,4 @@
-package com.art3mvp.newsclient.presentation.main
+package com.art3mvp.newsclient.domain
 
 sealed class AuthState {
 
