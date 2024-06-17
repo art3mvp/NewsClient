@@ -1,4 +1,4 @@
-package com.art3mvp.newsclient.domain
+package com.art3mvp.newsclient.domain.entity
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

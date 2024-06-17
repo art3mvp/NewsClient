@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.art3mvp.newsclient.R
-import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.domain.PostComment
+import com.art3mvp.newsclient.domain.entity.FeedPost
+import com.art3mvp.newsclient.domain.entity.PostComment
 
 
 @OptIn(ExperimentalMaterial3Api::class)

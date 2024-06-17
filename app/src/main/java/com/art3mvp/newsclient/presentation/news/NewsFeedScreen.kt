@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.domain.NewsFeedResult
+import com.art3mvp.newsclient.domain.entity.FeedPost
+import com.art3mvp.newsclient.domain.entity.NewsFeedResult
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -37,17 +37,18 @@ fun NewsFeedScreen(
     val viewModel: NewsFeedViewModel = viewModel()
 
     val screenState = viewModel.screenState.collectAsState(NewsFeedResult.Loading)
-    val refreshingState = viewModel.refreshingState.collectAsState(false)
 
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = refreshingState.value,
-        onRefresh = {
-            viewModel.reloadRecommendations()
-        }
-    )
+
 
     when (val currentState = screenState.value) {
         is NewsFeedResult.Success -> {
+
+            val pullRefreshState = rememberPullRefreshState(
+                refreshing = currentState.refreshing,
+                onRefresh = {
+                    viewModel.reloadRecommendations()
+                }
+            )
 
             Box(
                 modifier = Modifier.pullRefresh(pullRefreshState)
@@ -61,12 +62,11 @@ fun NewsFeedScreen(
                     nextDataIsLoading = currentState.nextDataLoading,
                 )
                 PullRefreshIndicator(
-                    refreshing = refreshingState.value,
+                    refreshing = currentState.refreshing,
                     state = pullRefreshState,
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
             }
-
         }
 
         is NewsFeedResult.Loading -> {

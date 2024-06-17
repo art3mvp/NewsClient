@@ -1,9 +1,8 @@
 package com.art3mvp.newsclient.navigation
 
 import android.net.Uri
-import com.art3mvp.newsclient.domain.FeedPost
+import com.art3mvp.newsclient.domain.entity.FeedPost
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 
 sealed class Screen(
     val route: String,

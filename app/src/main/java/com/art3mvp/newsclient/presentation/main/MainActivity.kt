@@ -6,7 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.art3mvp.newsclient.domain.AuthState
+import com.art3mvp.newsclient.domain.entity.AuthState
 import com.art3mvp.newsclient.ui.theme.NewsClientTheme
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKScope
