@@ -1,6 +1,4 @@
-package com.art3mvp.newsclient.domain
-
-import com.art3mvp.newsclient.R
+package com.art3mvp.newsclient.domain.entity
 
 data class PostComment(
     val id: Long = 0,

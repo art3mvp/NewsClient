@@ -1,12 +1,11 @@
 package com.art3mvp.newsclient.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.art3mvp.newsclient.domain.FeedPost
+import com.art3mvp.newsclient.domain.entity.FeedPost
 
 class NavigationState(val navHostController: NavHostController) {
 

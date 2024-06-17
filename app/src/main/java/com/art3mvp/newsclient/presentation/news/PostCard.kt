@@ -28,9 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.art3mvp.newsclient.R
-import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.domain.StatisticItem
-import com.art3mvp.newsclient.domain.StatisticType
+import com.art3mvp.newsclient.domain.entity.FeedPost
+import com.art3mvp.newsclient.domain.entity.StatisticItem
+import com.art3mvp.newsclient.domain.entity.StatisticType
 import java.util.Locale
 
 

@@ -2,10 +2,10 @@ package com.art3mvp.newsclient.data.mapper
 
 import com.art3mvp.newsclient.data.model.CommentsResponseDto
 import com.art3mvp.newsclient.data.model.NewsFeedResponseDto
-import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.domain.PostComment
-import com.art3mvp.newsclient.domain.StatisticItem
-import com.art3mvp.newsclient.domain.StatisticType
+import com.art3mvp.newsclient.domain.entity.FeedPost
+import com.art3mvp.newsclient.domain.entity.PostComment
+import com.art3mvp.newsclient.domain.entity.StatisticItem
+import com.art3mvp.newsclient.domain.entity.StatisticType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

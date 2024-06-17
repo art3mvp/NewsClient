@@ -1,14 +1,11 @@
-package com.art3mvp.newsclient.domain
+package com.art3mvp.newsclient.domain.entity
 
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
-import com.art3mvp.newsclient.R
 import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
-import kotlin.random.Random
 
 @Parcelize
 data class FeedPost(

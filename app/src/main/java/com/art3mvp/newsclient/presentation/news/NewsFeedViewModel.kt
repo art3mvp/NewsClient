@@ -2,15 +2,18 @@ package com.art3mvp.newsclient.presentation.news
 
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.art3mvp.newsclient.data.repository.NewsFeedRepositoryImpl
-import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.domain.NewsFeedResult
+import com.art3mvp.newsclient.domain.entity.FeedPost
+import com.art3mvp.newsclient.domain.entity.NewsFeedResult
+import com.art3mvp.newsclient.domain.usecases.ChangeLikeStatusUseCase
+import com.art3mvp.newsclient.domain.usecases.GetRecommendationsUseCase
+import com.art3mvp.newsclient.domain.usecases.IgnorePostUseCase
+import com.art3mvp.newsclient.domain.usecases.LoadNextDataUseCase
+import com.art3mvp.newsclient.domain.usecases.RefreshDataUseCase
 import com.art3mvp.newsclient.extensions.mergeWith
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,15 +24,20 @@ class NewsFeedViewModel(application: Application) : AndroidViewModel(application
 
 
     private val repository = NewsFeedRepositoryImpl(application)
-    private val exceptionHandler =
-        CoroutineExceptionHandler { _,_ -> Log.d("VVV", "error, something bad")}
 
-    private val recommendationsFlow = repository.recommendations
+    private val getRecommendationsUseCase = GetRecommendationsUseCase(repository)
+    private val loadNextDataUseCase= LoadNextDataUseCase(repository)
+    private val changeLikeStatusUseCase = ChangeLikeStatusUseCase(repository)
+    private val ignorePostUseCase = IgnorePostUseCase(repository)
+    private val refreshDataUseCase = RefreshDataUseCase(repository)
+
+
+    private val exceptionHandler =
+        CoroutineExceptionHandler { _, _ -> Log.d("VVV", "error, something bad") }
+
+    private val recommendationsFlow = getRecommendationsUseCase()
 
     private val loadNextDataFlow = MutableSharedFlow<NewsFeedResult>()
-
-    private val _refreshingState = MutableStateFlow(false)
-    val refreshingState = _refreshingState.asStateFlow()
 
     val screenState = recommendationsFlow
         .onStart { NewsFeedResult.Loading }
@@ -51,28 +59,39 @@ class NewsFeedViewModel(application: Application) : AndroidViewModel(application
                 }
                 else -> {}
             }
-            repository.loadNextData()
+            loadNextDataUseCase()
         }
     }
 
     fun reloadRecommendations() {
         viewModelScope.launch {
-            _refreshingState.emit(true)
-            repository.refreshData()
-            _refreshingState.emit(false)
+            when (recommendationsFlow.value) {
+                is NewsFeedResult.Success -> {
+                    val stateSuccess = recommendationsFlow.value as NewsFeedResult.Success
+                    Log.d("VVV", "reload recommendations with refresh value ${stateSuccess.refreshing} and size ${stateSuccess.posts.size}")
+                    loadNextDataFlow.emit(
+                        NewsFeedResult.Success(
+                            posts = stateSuccess.posts,
+                            refreshing = true
+                        )
+                    )
+                }
+                else -> {}
+            }
+            refreshDataUseCase()
         }
     }
 
 
     fun changeLikeStatus(feedPost: FeedPost) {
         viewModelScope.launch(exceptionHandler) {
-            repository.changeLikeStatus(feedPost)
+            changeLikeStatusUseCase(feedPost)
         }
     }
 
     fun removeFeedPost(feedPost: FeedPost) {
         viewModelScope.launch(exceptionHandler) {
-            repository.ignorePost(feedPost)
+            ignorePostUseCase(feedPost)
         }
     }
 }

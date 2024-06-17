@@ -1,7 +1,7 @@
 package com.art3mvp.newsclient.presentation.comments
 
-import com.art3mvp.newsclient.domain.FeedPost
-import com.art3mvp.newsclient.domain.PostComment
+import com.art3mvp.newsclient.domain.entity.FeedPost
+import com.art3mvp.newsclient.domain.entity.PostComment
 
 sealed class CommentsScreenState {
 

@@ -1,8 +1,6 @@
 package com.art3mvp.newsclient.presentation.news
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SwipeToDismissBox
@@ -15,9 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import com.art3mvp.newsclient.domain.FeedPost
+import com.art3mvp.newsclient.domain.entity.FeedPost
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
