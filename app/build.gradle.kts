@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -70,6 +71,9 @@ dependencies {
 
     implementation("androidx.compose.material:material:1.6.8")
 
+    val dagger2_version = "2.51.1"
+    implementation("com.google.dagger:dagger:$dagger2_version")
+    kapt("com.google.dagger:dagger-compiler:$dagger2_version")
 
     val nav_version = "2.7.7"
 

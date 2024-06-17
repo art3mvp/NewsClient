@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.art3mvp.newsclient.domain.entity.FeedPost
+import com.art3mvp.newsclient.presentation.ViewModelFactory
 
 @Composable
 fun AppNavGraph(

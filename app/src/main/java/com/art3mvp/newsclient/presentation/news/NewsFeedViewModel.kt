@@ -1,10 +1,8 @@
 package com.art3mvp.newsclient.presentation.news
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.art3mvp.newsclient.data.repository.NewsFeedRepositoryImpl
 import com.art3mvp.newsclient.domain.entity.FeedPost
 import com.art3mvp.newsclient.domain.entity.NewsFeedResult
 import com.art3mvp.newsclient.domain.usecases.ChangeLikeStatusUseCase
@@ -15,25 +13,22 @@ import com.art3mvp.newsclient.domain.usecases.RefreshDataUseCase
 import com.art3mvp.newsclient.extensions.mergeWith
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NewsFeedViewModel(application: Application) : AndroidViewModel(application) {
-
-
-    private val repository = NewsFeedRepositoryImpl(application)
-
-    private val getRecommendationsUseCase = GetRecommendationsUseCase(repository)
-    private val loadNextDataUseCase= LoadNextDataUseCase(repository)
-    private val changeLikeStatusUseCase = ChangeLikeStatusUseCase(repository)
-    private val ignorePostUseCase = IgnorePostUseCase(repository)
-    private val refreshDataUseCase = RefreshDataUseCase(repository)
-
+class NewsFeedViewModel @Inject constructor(
+    private val getRecommendationsUseCase: GetRecommendationsUseCase,
+            private val loadNextDataUseCase: LoadNextDataUseCase,
+            private val changeLikeStatusUseCase: ChangeLikeStatusUseCase,
+            private val ignorePostUseCase: IgnorePostUseCase,
+            private val refreshDataUseCase: RefreshDataUseCase
+) : ViewModel() {
 
     private val exceptionHandler =
-        CoroutineExceptionHandler { _, _ -> Log.d("VVV", "error, something bad") }
+        CoroutineExceptionHandler { _, _ ->
+            Log.d("VVV", "connection Error")
+        }
 
     private val recommendationsFlow = getRecommendationsUseCase()
 
