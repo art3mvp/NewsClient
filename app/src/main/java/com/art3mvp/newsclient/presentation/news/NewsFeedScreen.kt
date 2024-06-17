@@ -25,16 +25,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.art3mvp.newsclient.domain.entity.FeedPost
 import com.art3mvp.newsclient.domain.entity.NewsFeedResult
+import com.art3mvp.newsclient.presentation.ViewModelFactory
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewsFeedScreen(
+    viewModelFactory: ViewModelFactory,
     innerPaddingValues: PaddingValues,
     onCommentClickListener: (FeedPost) -> Unit,
 ) {
 
-    val viewModel: NewsFeedViewModel = viewModel()
+    val viewModel: NewsFeedViewModel = viewModel(factory = viewModelFactory)
 
     val screenState = viewModel.screenState.collectAsState(NewsFeedResult.Loading)
 

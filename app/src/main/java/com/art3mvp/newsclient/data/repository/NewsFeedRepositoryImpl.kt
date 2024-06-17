@@ -3,7 +3,7 @@ package com.art3mvp.newsclient.data.repository
 import android.app.Application
 import android.util.Log
 import com.art3mvp.newsclient.data.mapper.MainMapper
-import com.art3mvp.newsclient.data.network.ApiFactory
+import com.art3mvp.newsclient.data.network.ApiService
 import com.art3mvp.newsclient.domain.entity.AuthState
 import com.art3mvp.newsclient.domain.entity.FeedPost
 import com.art3mvp.newsclient.domain.entity.NewsFeedResult
@@ -24,16 +24,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
-class NewsFeedRepositoryImpl(application: Application): NewsFeedRepository {
+class NewsFeedRepositoryImpl @Inject constructor(
+    private val storage: VKPreferencesKeyValueStorage,
+    private val apiService: ApiService,
+    private val mapper: MainMapper,
+) : NewsFeedRepository {
 
-    private val storage = VKPreferencesKeyValueStorage(application)
+
     private val token
         get() = VKAccessToken.restore(storage)
-
-
-    private val apiService = ApiFactory.apiService
-    private val mapper = MainMapper()
 
     private var nextFrom: String? = null
 
