@@ -40,8 +40,6 @@ fun NewsFeedScreen(
 
     val screenState = viewModel.screenState.collectAsState(NewsFeedResult.Loading)
 
-
-
     when (val currentState = screenState.value) {
         is NewsFeedResult.Success -> {
 

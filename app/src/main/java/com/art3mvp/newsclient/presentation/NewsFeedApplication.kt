@@ -10,22 +10,6 @@ import com.art3mvp.newsclient.domain.entity.StatisticType
 class NewsFeedApplication : Application() {
 
     val component: ApplicationComponent by lazy {
-        DaggerApplicationComponent.factory().create(
-            this, FeedPost(
-                1,
-                1,
-                "",
-                "",
-                "",
-                "",
-                "",
-                listOf<StatisticItem>(
-                    StatisticItem(StatisticType.VIEWS, 1),
-                    StatisticItem(StatisticType.COMMENTS, 1),
-                    StatisticItem(StatisticType.SHARES),
-                    StatisticItem(StatisticType.LIKES)
-                ), false
-            )
-        )
+        DaggerApplicationComponent.factory().create(this)
     }
 }
