@@ -1,5 +1,7 @@
 package com.art3mvp.newsclient.presentation.comments
 
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,7 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,11 +26,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,27 +39,37 @@ import coil.compose.AsyncImage
 import com.art3mvp.newsclient.R
 import com.art3mvp.newsclient.domain.entity.FeedPost
 import com.art3mvp.newsclient.domain.entity.PostComment
-import com.art3mvp.newsclient.presentation.NewsFeedApplication
-import com.art3mvp.newsclient.presentation.ViewModelFactory
+import com.art3mvp.newsclient.presentation.getApplicationComponent
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(
     onBackPressed: () -> Unit,
     feedPost: FeedPost,
 ) {
 
-    val component = (LocalContext.current.applicationContext as NewsFeedApplication)
-        .component
+    val component = getApplicationComponent()
         .getCommentsScreenComponentFactory()
         .create(feedPost)
 
     val viewModel: CommentsViewModel = viewModel(factory = component.getViewModelFactory())
 
     val screenState = viewModel.screenState.collectAsState(CommentsScreenState.Initial)
-    val currentState = screenState.value
 
+    CommentsScreenContainer(
+        screenState = screenState,
+        onBackPressed = onBackPressed
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CommentsScreenContainer(
+    screenState: State<CommentsScreenState>,
+    onBackPressed: () -> Unit,
+
+    ) {
+    val currentState = screenState.value
     if (currentState is CommentsScreenState.Comments) {
         Scaffold(
             topBar = {
@@ -71,7 +83,7 @@ fun CommentsScreen(
                     title = { Text(text = stringResource(R.string.comments)) },
                     navigationIcon = {
                         IconButton(onClick = { onBackPressed() }) {
-                            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null)
+                            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
                         }
                     }
                 )
@@ -113,7 +125,10 @@ private fun CommentItem(
             model = comment.avatarUrl,
             modifier = Modifier
                 .size(48.dp)
-                .clip(CircleShape),
+                .clip(CircleShape)
+                .clickable {
+                           Log.d("VVV", "clicked on avatar")
+                },
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(8.dp))

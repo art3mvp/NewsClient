@@ -2,6 +2,7 @@ package com.art3mvp.newsclient.di
 
 import android.content.Context
 import com.art3mvp.newsclient.domain.entity.FeedPost
+import com.art3mvp.newsclient.presentation.ViewModelFactory
 import com.art3mvp.newsclient.presentation.main.MainActivity
 import dagger.BindsInstance
 import dagger.Component
@@ -10,7 +11,7 @@ import dagger.Component
 @Component(modules = [DataModule::class, ViewModelModule::class])
 interface ApplicationComponent {
 
-    fun inject(mainActivity: MainActivity)
+    fun getViewModelFactory(): ViewModelFactory
 
     fun getCommentsScreenComponentFactory(): CommentsScreenComponent.Factory
 
