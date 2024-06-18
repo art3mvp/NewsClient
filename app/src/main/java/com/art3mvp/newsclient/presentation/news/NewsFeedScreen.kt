@@ -17,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,21 +26,34 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.art3mvp.newsclient.domain.entity.FeedPost
 import com.art3mvp.newsclient.domain.entity.NewsFeedResult
-import com.art3mvp.newsclient.presentation.ViewModelFactory
+import com.art3mvp.newsclient.presentation.getApplicationComponent
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewsFeedScreen(
-    viewModelFactory: ViewModelFactory,
     innerPaddingValues: PaddingValues,
     onCommentClickListener: (FeedPost) -> Unit,
 ) {
-
-    val viewModel: NewsFeedViewModel = viewModel(factory = viewModelFactory)
-
+    val component = getApplicationComponent()
+    val viewModel: NewsFeedViewModel = viewModel(factory = component.getViewModelFactory())
     val screenState = viewModel.screenState.collectAsState(NewsFeedResult.Loading)
+    
+    ScreenContent(
+        screenState = screenState,
+        viewModel = viewModel,
+        onCommentClickListener = onCommentClickListener,
+        innerPaddingValues = innerPaddingValues
+    )
+}
 
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun ScreenContent(
+    screenState: State<NewsFeedResult>,
+    viewModel: NewsFeedViewModel,
+    onCommentClickListener: (FeedPost) -> Unit,
+    innerPaddingValues: PaddingValues
+    ) {
     when (val currentState = screenState.value) {
         is NewsFeedResult.Success -> {
 

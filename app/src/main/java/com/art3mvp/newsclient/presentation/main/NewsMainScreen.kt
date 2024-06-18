@@ -27,7 +27,7 @@ import com.art3mvp.newsclient.presentation.news.NewsFeedScreen
 
 
 @Composable
-fun MainScreen(viewModelFactory: ViewModelFactory) {
+fun MainScreen() {
     val navigationState = rememberNavigationState()
 
     Scaffold(
@@ -79,7 +79,6 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
             navHostController = navigationState.navHostController,
             newsFeedScreenContent = {
                 NewsFeedScreen(
-                    viewModelFactory = viewModelFactory,
                     innerPaddingValues = innerPadding,
                     onCommentClickListener = {
                         navigationState.navigateToComments(it)
