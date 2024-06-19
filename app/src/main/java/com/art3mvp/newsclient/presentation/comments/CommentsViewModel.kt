@@ -14,6 +14,7 @@ class CommentsViewModel @Inject constructor(
     private val getCommentsUseCase: GetCommentsUseCase
 ) : ViewModel() {
 
+    val data = getCommentsUseCase(feedPost)
     val screenState: Flow<CommentsScreenState> = getCommentsUseCase(feedPost)
         .map { CommentsScreenState.Comments(feedPost, it) }
 

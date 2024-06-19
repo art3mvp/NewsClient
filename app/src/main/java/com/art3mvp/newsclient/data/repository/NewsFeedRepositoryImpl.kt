@@ -1,6 +1,5 @@
 package com.art3mvp.newsclient.data.repository
 
-import android.app.Application
 import android.util.Log
 import com.art3mvp.newsclient.data.mapper.MainMapper
 import com.art3mvp.newsclient.data.network.ApiService
@@ -35,6 +34,7 @@ class NewsFeedRepositoryImpl @Inject constructor(
 
     private val token
         get() = VKAccessToken.restore(storage)
+
 
     private var nextFrom: String? = null
 

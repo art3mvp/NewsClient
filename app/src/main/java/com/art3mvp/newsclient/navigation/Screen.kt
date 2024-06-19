@@ -8,7 +8,7 @@ sealed class Screen(
     val route: String,
 ) {
     object NewsFeed : Screen(ROUTE_NEWS_FEED)
-    object Favourite : Screen(ROUTE_FAVOURITE)
+    object Camera : Screen(ROUTE_CAMERA)
     object Profile : Screen(ROUTE_PROFILE)
 
     object Home : Screen(ROUTE_HOME)
@@ -30,7 +30,7 @@ sealed class Screen(
         const val ROUTE_HOME = "home"
         const val ROUTE_COMMENTS = "comments/{$KEY_FEED_POST}"
         const val ROUTE_NEWS_FEED = "news_feed"
-        const val ROUTE_FAVOURITE = "favourite"
+        const val ROUTE_CAMERA = "camera"
         const val ROUTE_PROFILE = "profile"
     }
 }

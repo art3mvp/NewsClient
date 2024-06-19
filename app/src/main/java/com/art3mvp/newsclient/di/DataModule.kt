@@ -1,10 +1,11 @@
 package com.art3mvp.newsclient.di
 
-import android.app.Application
 import android.content.Context
 import com.art3mvp.newsclient.data.network.ApiFactory
 import com.art3mvp.newsclient.data.network.ApiService
+import com.art3mvp.newsclient.data.repository.CameraRepositoryImpl
 import com.art3mvp.newsclient.data.repository.NewsFeedRepositoryImpl
+import com.art3mvp.newsclient.domain.repository.CameraRepository
 import com.art3mvp.newsclient.domain.repository.NewsFeedRepository
 import com.vk.api.sdk.VKPreferencesKeyValueStorage
 import dagger.Binds
@@ -16,7 +17,11 @@ interface DataModule {
 
     @ApplicationScope
     @Binds
-    fun bindRepository(impl: NewsFeedRepositoryImpl): NewsFeedRepository
+    fun bindNewsFeedRepository(impl: NewsFeedRepositoryImpl): NewsFeedRepository
+
+    @ApplicationScope
+    @Binds
+    fun bindCameraRepository(impl: CameraRepositoryImpl): CameraRepository
 
 
     companion object {

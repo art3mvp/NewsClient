@@ -1,5 +1,6 @@
 package com.art3mvp.newsclient.di
 
+import android.app.Application
 import android.content.Context
 import com.art3mvp.newsclient.domain.entity.FeedPost
 import com.art3mvp.newsclient.presentation.ViewModelFactory
