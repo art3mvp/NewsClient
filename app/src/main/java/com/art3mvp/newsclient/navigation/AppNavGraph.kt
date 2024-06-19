@@ -11,7 +11,7 @@ import com.art3mvp.newsclient.presentation.ViewModelFactory
 fun AppNavGraph(
     navHostController: NavHostController,
     newsFeedScreenContent: @Composable () -> Unit,
-    favouriteScreenContent: @Composable () -> Unit,
+    cameraScreenContent: @Composable () -> Unit,
     profileScreenContent: @Composable () -> Unit,
     commentsScreenContent: @Composable (FeedPost) -> Unit
 ) {
@@ -25,8 +25,8 @@ fun AppNavGraph(
             commentsScreenContent = commentsScreenContent
         )
 
-        composable(Screen.Favourite.route) {
-            favouriteScreenContent()
+        composable(Screen.Camera.route) {
+            cameraScreenContent()
         }
         composable(Screen.Profile.route) {
             profileScreenContent()

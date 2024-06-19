@@ -2,7 +2,7 @@ package com.art3mvp.newsclient.presentation.main
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountBox
-import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.art3mvp.newsclient.R
@@ -19,10 +19,10 @@ sealed class NavigationItem(
         icon = Icons.Rounded.Home
     )
 
-    data object Favorite : NavigationItem(
-        screen = Screen.Favourite,
-        titleResId = R.string.navigation_item_favorite,
-        icon = Icons.Rounded.Favorite
+    data object Camera : NavigationItem(
+        screen = Screen.Camera,
+        titleResId = R.string.camera,
+        icon = Icons.Rounded.CameraAlt
     )
 
     data object Profile : NavigationItem(

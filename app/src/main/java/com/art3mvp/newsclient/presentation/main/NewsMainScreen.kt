@@ -21,7 +21,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.art3mvp.newsclient.navigation.AppNavGraph
 import com.art3mvp.newsclient.navigation.rememberNavigationState
-import com.art3mvp.newsclient.presentation.ViewModelFactory
+import com.art3mvp.newsclient.presentation.camera.CameraScreen
 import com.art3mvp.newsclient.presentation.comments.CommentsScreen
 import com.art3mvp.newsclient.presentation.news.NewsFeedScreen
 
@@ -36,23 +36,19 @@ fun MainScreen() {
                 contentColor = MaterialTheme.colorScheme.primary
             ) {
                 val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
 
                 val items = listOf(
                     NavigationItem.Home,
-                    NavigationItem.Favorite,
+                    NavigationItem.Camera,
                     NavigationItem.Profile
                 )
                 items.forEach { item ->
 
                     val selected = navBackStackEntry?.destination?.hierarchy?.any {
 
-
                         it.route == item.screen.route
 
                     } ?: false
-
-
 
                     NavigationBarItem(
                         selected = selected,
@@ -80,12 +76,10 @@ fun MainScreen() {
             newsFeedScreenContent = {
                 NewsFeedScreen(
                     innerPaddingValues = innerPadding,
-                    onCommentClickListener = {
-                        navigationState.navigateToComments(it)
-                    }
+                    onCommentClickListener = { navigationState.navigateToComments(it) }
                 )
             },
-            favouriteScreenContent = { TextCounter("Favorite") },
+            cameraScreenContent = { CameraScreen(innerPadding) },
             profileScreenContent = { TextCounter("Profile") },
             commentsScreenContent = {feedPost ->
                 CommentsScreen(
