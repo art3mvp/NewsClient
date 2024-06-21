@@ -11,6 +11,7 @@ import com.art3mvp.newsclient.domain.entity.StatisticItem
 import com.art3mvp.newsclient.domain.entity.StatisticType
 import com.art3mvp.newsclient.domain.repository.NewsFeedRepository
 import com.art3mvp.newsclient.extensions.mergeWith
+import com.art3mvp.newsclient.presentation.profile.ProfileState
 import com.vk.api.sdk.VKPreferencesKeyValueStorage
 import com.vk.api.sdk.auth.VKAccessToken
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +43,7 @@ class NewsFeedRepositoryImpl @Inject constructor(
 
     private val checkAuthStateEvents = MutableSharedFlow<Unit>(replay = 1)
 
+    private val loadProfileEvent = MutableSharedFlow<Unit>(replay = 1)
 
     private val nextDataNeededEvent = MutableSharedFlow<Unit>(replay = 1)
     private val refreshedListFlow = MutableSharedFlow<NewsFeedResult>()
@@ -68,6 +70,34 @@ class NewsFeedRepositoryImpl @Inject constructor(
         delay(RETRY_TIMEOUT)
         true
     }
+
+    private suspend fun getProfileId(): Long {
+        return apiService.getProfileId(getAccessToken()).profileIdContainer.id
+    }
+
+
+    private val profileFlow: StateFlow<ProfileState> = flow {
+        val profileId = getProfileId()
+
+        val photosResponse = apiService.getProfilePhotos(
+            token = getAccessToken(),
+            ownerId = profileId
+        )
+        val userResponse = apiService.getUserInfo(
+            token = getAccessToken(),
+            ownerId = profileId
+        )
+
+        val profile = mapper.mapResponseToProfile(userResponse, photosResponse)
+        emit(ProfileState.Success(profile))
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = ProfileState.Initial
+    )
+
+
+    override fun getProfile(): StateFlow<ProfileState> = profileFlow
 
     private val _feedPosts = mutableListOf<FeedPost>()
     private val feedPosts: List<FeedPost>
