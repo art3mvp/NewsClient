@@ -20,10 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.art3mvp.newsclient.navigation.AppNavGraph
+import com.art3mvp.newsclient.navigation.NavigationItem
 import com.art3mvp.newsclient.navigation.rememberNavigationState
 import com.art3mvp.newsclient.presentation.camera.CameraScreen
 import com.art3mvp.newsclient.presentation.comments.CommentsScreen
 import com.art3mvp.newsclient.presentation.news.NewsFeedScreen
+import com.art3mvp.newsclient.presentation.profile.ProfileScreen
 
 
 @Composable
@@ -45,9 +47,7 @@ fun MainScreen() {
                 items.forEach { item ->
 
                     val selected = navBackStackEntry?.destination?.hierarchy?.any {
-
                         it.route == item.screen.route
-
                     } ?: false
 
                     NavigationBarItem(
@@ -80,7 +80,7 @@ fun MainScreen() {
                 )
             },
             cameraScreenContent = { CameraScreen(innerPadding) },
-            profileScreenContent = { TextCounter("Profile") },
+            profileScreenContent = { ProfileScreen(innerPadding) },
             commentsScreenContent = {feedPost ->
                 CommentsScreen(
                     feedPost = feedPost,

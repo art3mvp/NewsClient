@@ -4,6 +4,8 @@ import com.art3mvp.newsclient.domain.entity.AuthState
 import com.art3mvp.newsclient.domain.entity.FeedPost
 import com.art3mvp.newsclient.domain.entity.NewsFeedResult
 import com.art3mvp.newsclient.domain.entity.PostComment
+import com.art3mvp.newsclient.domain.entity.Profile
+import com.art3mvp.newsclient.presentation.profile.ProfileState
 import kotlinx.coroutines.flow.StateFlow
 
 interface NewsFeedRepository {
@@ -13,6 +15,8 @@ interface NewsFeedRepository {
     fun getRecommendations(): StateFlow<NewsFeedResult>
 
     fun getComments(feedPost: FeedPost): StateFlow<List<PostComment>>
+
+    fun getProfile(): StateFlow<ProfileState>
 
     suspend fun checkAuthState()
 

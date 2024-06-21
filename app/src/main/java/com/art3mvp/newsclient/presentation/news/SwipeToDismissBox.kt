@@ -1,5 +1,6 @@
 package com.art3mvp.newsclient.presentation.news
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.material3.ExperimentalMaterial3Api

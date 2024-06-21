@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.art3mvp.newsclient.presentation.camera.CameraViewModel
 import com.art3mvp.newsclient.presentation.main.MainViewModel
 import com.art3mvp.newsclient.presentation.news.NewsFeedViewModel
+import com.art3mvp.newsclient.presentation.profile.ProfileViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -27,5 +28,9 @@ interface ViewModelModule {
     @Binds
     fun bindCameraViewModel(viewModel: CameraViewModel): ViewModel
 
+    @IntoMap
+    @ViewModelKey(ProfileViewModel::class)
+    @Binds
+    fun bindProfileViewModel(viewModel: ProfileViewModel): ViewModel
 
 }
