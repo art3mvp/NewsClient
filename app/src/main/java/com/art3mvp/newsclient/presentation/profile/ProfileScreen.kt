@@ -59,11 +59,11 @@ fun ProfileScreen(innerPaddingValues: PaddingValues) {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(150.dp)
                 )
                 Card(
                     modifier = Modifier
-                        .offset(y = 180.dp),
+                        .offset(y = 140.dp),
                     elevation = CardDefaults.elevatedCardElevation()
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -72,30 +72,28 @@ fun ProfileScreen(innerPaddingValues: PaddingValues) {
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .align(Alignment.CenterHorizontally)
-                            .offset(y = (-50).dp),
+                            .padding(top = 50.dp)
+                            .align(Alignment.CenterHorizontally),
                         text = profile.firstName + "    " + profile.lastName
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally),
                         textAlign = TextAlign.Center,
                         text = profile.status
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-
-
                     LazyVerticalGrid(
                         contentPadding = PaddingValues(
-                            horizontal = 16.dp,
-                            vertical = 8.dp
+                            top = 10.dp,
+                            bottom = 250.dp
                         ),
                         columns = GridCells.Fixed(3)
                     ) {
                         items(profile.images) { imageUrl ->
 
                             Card(
-
                                 modifier = Modifier
                                     .padding(4.dp)
                                     .aspectRatio(1f),
@@ -117,7 +115,7 @@ fun ProfileScreen(innerPaddingValues: PaddingValues) {
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .size(100.dp)
-                        .offset(y = 130.dp)
+                        .offset(y = 90.dp)
                         .clip(CircleShape)
                         .background(Color.White)
                         .padding(4.dp)
