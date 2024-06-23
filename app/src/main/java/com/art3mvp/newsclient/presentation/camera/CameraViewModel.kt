@@ -3,6 +3,7 @@ package com.art3mvp.newsclient.presentation.camera
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.art3mvp.newsclient.domain.entity.CameraScreenState
 import com.art3mvp.newsclient.domain.usecases.GetBitmapListUseCase
 import com.art3mvp.newsclient.domain.usecases.ReloadGalleryUseCase
 import com.art3mvp.newsclient.domain.usecases.TakePhotoUseCase

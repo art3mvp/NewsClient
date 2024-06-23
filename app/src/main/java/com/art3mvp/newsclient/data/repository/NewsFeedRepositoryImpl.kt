@@ -5,19 +5,17 @@ import com.art3mvp.newsclient.data.mapper.MainMapper
 import com.art3mvp.newsclient.data.network.ApiService
 import com.art3mvp.newsclient.domain.entity.AuthState
 import com.art3mvp.newsclient.domain.entity.FeedPost
-import com.art3mvp.newsclient.domain.entity.NewsFeedResult
 import com.art3mvp.newsclient.domain.entity.PostComment
+import com.art3mvp.newsclient.domain.entity.Profile
 import com.art3mvp.newsclient.domain.entity.StatisticItem
 import com.art3mvp.newsclient.domain.entity.StatisticType
 import com.art3mvp.newsclient.domain.repository.NewsFeedRepository
 import com.art3mvp.newsclient.extensions.mergeWith
-import com.art3mvp.newsclient.presentation.profile.ProfileState
 import com.vk.api.sdk.VKPreferencesKeyValueStorage
 import com.vk.api.sdk.auth.VKAccessToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,28 +30,49 @@ class NewsFeedRepositoryImpl @Inject constructor(
     private val mapper: MainMapper,
 ) : NewsFeedRepository {
 
-
     private val token
         get() = VKAccessToken.restore(storage)
 
-
-    private var nextFrom: String? = null
-
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+    // Auth
     private val checkAuthStateEvents = MutableSharedFlow<Unit>(replay = 1)
+    private val authStateFlow = flow {
+        checkAuthStateEvents.emit(Unit)
+        checkAuthStateEvents.collect {
+            Log.d("VVV", "Token: ${token?.accessToken}")
+            val currentToken = token
+            val loggedIn = currentToken != null && currentToken.isValid
+            val authState = if (loggedIn) AuthState.Authorized else AuthState.NotAuthorized
+            emit(authState)
+        }
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = AuthState.Initial
+    )
 
-    private val loadProfileEvent = MutableSharedFlow<Unit>(replay = 1)
+    private fun getAccessToken(): String {
+        return token?.accessToken ?: throw IllegalStateException("Token is null")
+    }
+
+    //cached posts
+    private val _feedPosts = mutableListOf<FeedPost>()
+    private val feedPosts: List<FeedPost>
+        get() = _feedPosts.toList()
+
+    //recommendations
+    private var nextFrom: String? = null
 
     private val nextDataNeededEvent = MutableSharedFlow<Unit>(replay = 1)
-    private val refreshedListFlow = MutableSharedFlow<NewsFeedResult>()
-    private val loadedListFlow: Flow<NewsFeedResult> = flow {
+    private val refreshedListFlow = MutableSharedFlow<List<FeedPost>>()
+    private val loadedListFlow = flow {
         nextDataNeededEvent.emit(Unit)
         nextDataNeededEvent.collect {
             val startFrom = nextFrom
             Log.d("VVV", "startFrom: $startFrom")
             if (startFrom == null && feedPosts.isNotEmpty()) {
-                this.emit(NewsFeedResult.Success(feedPosts) as NewsFeedResult)
+                this.emit(feedPosts)
                 return@collect
             }
             val response = if (startFrom == null) {
@@ -64,19 +83,26 @@ class NewsFeedRepositoryImpl @Inject constructor(
             nextFrom = response.newsFeedContent.nextFrom
             val posts = mapper.mapResponseToPosts(response)
             _feedPosts.addAll(posts)
-            this.emit(NewsFeedResult.Success(feedPosts) as NewsFeedResult)
+            this.emit(feedPosts)
         }
     }.retry {
         delay(RETRY_TIMEOUT)
         true
     }
+    private val recommendations: StateFlow<List<FeedPost>> = loadedListFlow
+        .mergeWith(refreshedListFlow)
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Lazily,
+            initialValue = feedPosts
+        )
 
+
+    //Profile
     private suspend fun getProfileId(): Long {
         return apiService.getProfileId(getAccessToken()).profileIdContainer.id
     }
-
-
-    private val profileFlow: StateFlow<ProfileState> = flow {
+    private val profileFlow: StateFlow<Profile?> = flow {
         val profileId = getProfileId()
 
         val photosResponse = apiService.getProfilePhotos(
@@ -89,35 +115,21 @@ class NewsFeedRepositoryImpl @Inject constructor(
         )
 
         val profile = mapper.mapResponseToProfile(userResponse, photosResponse)
-        emit(ProfileState.Success(profile))
+        emit(profile)
     }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.Lazily,
-        initialValue = ProfileState.Initial
+        initialValue = null
     )
 
-
-    override fun getProfile(): StateFlow<ProfileState> = profileFlow
-
-    private val _feedPosts = mutableListOf<FeedPost>()
-    private val feedPosts: List<FeedPost>
-        get() = _feedPosts.toList()
-
-    private val recommendations: StateFlow<NewsFeedResult> = loadedListFlow
-        .mergeWith(refreshedListFlow)
-        .stateIn(
-            scope = coroutineScope,
-            started = SharingStarted.Lazily,
-            initialValue = NewsFeedResult.Loading
-        )
+    // implementations
+    override fun getProfile(): StateFlow<Profile?> = profileFlow
 
     override suspend fun loadNextData() {
         nextDataNeededEvent.emit(Unit)
     }
 
-    override fun getAuthStateFlow(): StateFlow<AuthState> = authStateFlow
-
-    override fun getRecommendations(): StateFlow<NewsFeedResult> = recommendations
+    override fun getRecommendations(): StateFlow<List<FeedPost>> = recommendations
 
     override suspend fun refreshData() {
         _feedPosts.clear()
@@ -140,17 +152,15 @@ class NewsFeedRepositoryImpl @Inject constructor(
         initialValue = listOf()
     )
 
-    private fun getAccessToken(): String {
-        return token?.accessToken ?: throw IllegalStateException("Token is null")
-    }
-
     override suspend fun ignorePost(feedPost: FeedPost) {
         val response = apiService.ignorePost(
             token = getAccessToken(), ownerId = feedPost.communityId, itemId = feedPost.id
         )
         _feedPosts.remove(feedPost)
-        refreshedListFlow.emit(NewsFeedResult.Success(feedPosts))
+        refreshedListFlow.emit(feedPosts)
     }
+
+    override fun getAuthStateFlow(): StateFlow<AuthState> = authStateFlow
 
     override suspend fun changeLikeStatus(feedPost: FeedPost) {
         val response = if (feedPost.isLiked) {
@@ -170,24 +180,8 @@ class NewsFeedRepositoryImpl @Inject constructor(
         val newPost = feedPost.copy(statistics = newStatistics, isLiked = !feedPost.isLiked)
         val postIndex = _feedPosts.indexOf(feedPost)
         _feedPosts[postIndex] = newPost
-        refreshedListFlow.emit(NewsFeedResult.Success(feedPosts))
+        refreshedListFlow.emit(feedPosts)
     }
-
-    private val authStateFlow = flow {
-        checkAuthStateEvents.emit(Unit)
-        checkAuthStateEvents.collect {
-            Log.d("VVV", "Token: ${token?.accessToken}")
-            val currentToken = token
-            val loggedIn = currentToken != null && currentToken.isValid
-            val authState = if (loggedIn) AuthState.Authorized else AuthState.NotAuthorized
-            emit(authState)
-        }
-    }.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Lazily,
-        initialValue = AuthState.Initial
-    )
-
 
     override suspend fun checkAuthState() {
         checkAuthStateEvents.emit(Unit)

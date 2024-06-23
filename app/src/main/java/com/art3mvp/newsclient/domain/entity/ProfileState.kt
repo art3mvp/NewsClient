@@ -1,10 +1,10 @@
-package com.art3mvp.newsclient.presentation.profile
-
-import com.art3mvp.newsclient.domain.entity.Profile
+package com.art3mvp.newsclient.domain.entity
 
 sealed class ProfileState {
 
     object Initial: ProfileState()
+
+    object Loading : ProfileState()
 
     data class Success(
         val profile: Profile
