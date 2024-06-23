@@ -7,6 +7,8 @@ VkClient is a mini app within the VK ecosystem that provides access to the VK AP
 ### Home Screen
 - Displays a feed of posts recommended to the user.
 - Users can like posts and view comments on each post.
+- The feed of posts can be refreshed with a pull.
+- Users can left swipe to dislike a post, ensuring it is never recommended again.
 
 ### Camera Screen
 - Integrated with CameraX Google library for capturing photos.
