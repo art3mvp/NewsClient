@@ -52,6 +52,7 @@ fun ProfileCard(profile: Profile) {
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 horizontal = 16.dp,
                 vertical = 8.dp
