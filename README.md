@@ -15,7 +15,6 @@ VkClient is a mini app within the VK ecosystem that provides access to the VK AP
 
 ### Profile Screen
 - Displays the user's profile with cover photo, profile picture, and recent photos uploaded to VK.
-- All information is retrieved via API requests.
 
 ## Technical Details
 
