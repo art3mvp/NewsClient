@@ -1,4 +1,4 @@
-# VkClient
+# VKClient
 
 VkClient is a mini app within the VK ecosystem that provides access to the VK API to make HTTP requests. This app is a simulation of a social media application, offering a seamless user experience across three primary screens: home screen, camera screen, and profile screen.
 
