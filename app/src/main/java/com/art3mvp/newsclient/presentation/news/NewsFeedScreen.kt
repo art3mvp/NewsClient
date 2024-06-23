@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.art3mvp.newsclient.domain.entity.FeedPost
-import com.art3mvp.newsclient.domain.entity.NewsFeedResult
+import com.art3mvp.newsclient.domain.entity.NewsScreenState
 import com.art3mvp.newsclient.presentation.getApplicationComponent
 
 
@@ -36,7 +36,7 @@ fun NewsFeedScreen(
 ) {
     val component = getApplicationComponent()
     val viewModel: NewsFeedViewModel = viewModel(factory = component.getViewModelFactory())
-    val screenState = viewModel.screenState.collectAsState(NewsFeedResult.Loading)
+    val screenState = viewModel.screenState.collectAsState(NewsScreenState.Initial)
     
     ScreenContent(
         screenState = screenState,
@@ -49,13 +49,13 @@ fun NewsFeedScreen(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ScreenContent(
-    screenState: State<NewsFeedResult>,
+    screenState: State<NewsScreenState>,
     viewModel: NewsFeedViewModel,
     onCommentClickListener: (FeedPost) -> Unit,
     innerPaddingValues: PaddingValues
     ) {
     when (val currentState = screenState.value) {
-        is NewsFeedResult.Success -> {
+        is NewsScreenState.Posts -> {
 
             val pullRefreshState = rememberPullRefreshState(
                 refreshing = currentState.refreshing,
@@ -83,7 +83,7 @@ private fun ScreenContent(
             }
         }
 
-        is NewsFeedResult.Loading -> {
+        is NewsScreenState.Loading -> {
 
             Box(
                 modifier = Modifier
@@ -96,6 +96,8 @@ private fun ScreenContent(
                 )
             }
         }
+
+        else -> {}
     }
 }
 

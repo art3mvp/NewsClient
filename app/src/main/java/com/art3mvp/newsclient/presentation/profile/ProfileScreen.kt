@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.art3mvp.newsclient.domain.entity.ProfileState
 import com.art3mvp.newsclient.presentation.getApplicationComponent
 
 
@@ -20,7 +21,6 @@ fun ProfileScreen(innerPaddingValues: PaddingValues) {
     val component = getApplicationComponent()
     val viewModel: ProfileViewModel = viewModel(factory = component.getViewModelFactory())
     val profileState = viewModel.profile.collectAsState(ProfileState.Initial)
-
 
     when (val currentState = profileState.value) {
         is ProfileState.Success -> {

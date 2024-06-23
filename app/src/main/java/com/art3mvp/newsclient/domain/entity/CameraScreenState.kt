@@ -1,4 +1,4 @@
-package com.art3mvp.newsclient.presentation.camera
+package com.art3mvp.newsclient.domain.entity
 
 import android.graphics.Bitmap
 

@@ -39,6 +39,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.art3mvp.newsclient.domain.entity.CameraScreenState
 import com.art3mvp.newsclient.presentation.getApplicationComponent
 import kotlinx.coroutines.launch
 
