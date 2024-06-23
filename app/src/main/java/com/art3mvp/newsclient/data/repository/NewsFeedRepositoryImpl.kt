@@ -36,14 +36,30 @@ class NewsFeedRepositoryImpl @Inject constructor(
     private val token
         get() = VKAccessToken.restore(storage)
 
-
-    private var nextFrom: String? = null
-
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+    // Auth
     private val checkAuthStateEvents = MutableSharedFlow<Unit>(replay = 1)
+    private val authStateFlow = flow {
+        checkAuthStateEvents.emit(Unit)
+        checkAuthStateEvents.collect {
+            Log.d("VVV", "Token: ${token?.accessToken}")
+            val currentToken = token
+            val loggedIn = currentToken != null && currentToken.isValid
+            val authState = if (loggedIn) AuthState.Authorized else AuthState.NotAuthorized
+            emit(authState)
+        }
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = AuthState.Initial
+    )
+    private fun getAccessToken(): String {
+        return token?.accessToken ?: throw IllegalStateException("Token is null")
+    }
 
-    private val loadProfileEvent = MutableSharedFlow<Unit>(replay = 1)
+    //recommendations
+    private var nextFrom: String? = null
 
     private val nextDataNeededEvent = MutableSharedFlow<Unit>(replay = 1)
     private val refreshedListFlow = MutableSharedFlow<NewsFeedResult>()
@@ -70,12 +86,19 @@ class NewsFeedRepositoryImpl @Inject constructor(
         delay(RETRY_TIMEOUT)
         true
     }
+    private val recommendations: StateFlow<NewsFeedResult> = loadedListFlow
+        .mergeWith(refreshedListFlow)
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Lazily,
+            initialValue = NewsFeedResult.Loading
+        )
 
+
+    //Profile
     private suspend fun getProfileId(): Long {
         return apiService.getProfileId(getAccessToken()).profileIdContainer.id
     }
-
-
     private val profileFlow: StateFlow<ProfileState> = flow {
         val profileId = getProfileId()
 
@@ -96,26 +119,17 @@ class NewsFeedRepositoryImpl @Inject constructor(
         initialValue = ProfileState.Initial
     )
 
-
-    override fun getProfile(): StateFlow<ProfileState> = profileFlow
-
+    //cached posts
     private val _feedPosts = mutableListOf<FeedPost>()
     private val feedPosts: List<FeedPost>
         get() = _feedPosts.toList()
 
-    private val recommendations: StateFlow<NewsFeedResult> = loadedListFlow
-        .mergeWith(refreshedListFlow)
-        .stateIn(
-            scope = coroutineScope,
-            started = SharingStarted.Lazily,
-            initialValue = NewsFeedResult.Loading
-        )
+    // implementations
+    override fun getProfile(): StateFlow<ProfileState> = profileFlow
 
     override suspend fun loadNextData() {
         nextDataNeededEvent.emit(Unit)
     }
-
-    override fun getAuthStateFlow(): StateFlow<AuthState> = authStateFlow
 
     override fun getRecommendations(): StateFlow<NewsFeedResult> = recommendations
 
@@ -140,10 +154,6 @@ class NewsFeedRepositoryImpl @Inject constructor(
         initialValue = listOf()
     )
 
-    private fun getAccessToken(): String {
-        return token?.accessToken ?: throw IllegalStateException("Token is null")
-    }
-
     override suspend fun ignorePost(feedPost: FeedPost) {
         val response = apiService.ignorePost(
             token = getAccessToken(), ownerId = feedPost.communityId, itemId = feedPost.id
@@ -151,6 +161,8 @@ class NewsFeedRepositoryImpl @Inject constructor(
         _feedPosts.remove(feedPost)
         refreshedListFlow.emit(NewsFeedResult.Success(feedPosts))
     }
+
+    override fun getAuthStateFlow(): StateFlow<AuthState> = authStateFlow
 
     override suspend fun changeLikeStatus(feedPost: FeedPost) {
         val response = if (feedPost.isLiked) {
@@ -172,22 +184,6 @@ class NewsFeedRepositoryImpl @Inject constructor(
         _feedPosts[postIndex] = newPost
         refreshedListFlow.emit(NewsFeedResult.Success(feedPosts))
     }
-
-    private val authStateFlow = flow {
-        checkAuthStateEvents.emit(Unit)
-        checkAuthStateEvents.collect {
-            Log.d("VVV", "Token: ${token?.accessToken}")
-            val currentToken = token
-            val loggedIn = currentToken != null && currentToken.isValid
-            val authState = if (loggedIn) AuthState.Authorized else AuthState.NotAuthorized
-            emit(authState)
-        }
-    }.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Lazily,
-        initialValue = AuthState.Initial
-    )
-
 
     override suspend fun checkAuthState() {
         checkAuthStateEvents.emit(Unit)
