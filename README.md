@@ -20,7 +20,6 @@ VkClient is a mini app within the VK ecosystem. This app is a simulation of a so
 
 ## Technical Details
 
-VkClient is built using modern Android development practices, including:
 - **Compose UI** for declarative UI development.
 - **Clean Architecture** and **MVVM** patterns for maintainability and testability.
 - **Dependency Injection** for managing dependencies.
@@ -32,3 +31,5 @@ VkClient is built using modern Android development practices, including:
 - **Retrofit** and **OkHttp** for making HTTP requests.
 - **GSON** for JSON serialization and deserialization.
 - **CameraX** for camera integration.
+- **Coil** for asynchronous image loading.
+- **Dagger** for dependency injection.
